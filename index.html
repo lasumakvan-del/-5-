@@ -1,0 +1,1743 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>સંજ્ઞા પ્રકાર ઓળખો - સ્લાઇડ ક્વિઝ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Noto Sans Gujarati', 'Shruti', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quiz-wrapper {
+            width: 100vw;
+            height: 100vh;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: clamp(10px, 2vh, 20px) clamp(15px, 3vw, 30px);
+            text-align: center;
+            flex-shrink: 0;
+        }
+        
+        .header h1 {
+            font-size: clamp(18px, 3.5vh, 28px);
+            margin-bottom: clamp(3px, 0.5vh, 8px);
+            line-height: 1.2;
+        }
+        
+        .header p {
+            font-size: clamp(12px, 1.8vh, 16px);
+            opacity: 0.9;
+            line-height: 1.3;
+        }
+        
+        .progress-bar-container {
+            background: #e2e8f0;
+            height: clamp(4px, 0.8vh, 8px);
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .progress-bar {
+            background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            padding: clamp(8px, 1.5vh, 15px) clamp(10px, 2vw, 20px);
+            background: #f7fafc;
+            border-bottom: 2px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+        
+        .score-item {
+            text-align: center;
+        }
+        
+        .score-label {
+            font-size: clamp(10px, 1.5vh, 13px);
+            color: #718096;
+            margin-bottom: 2px;
+        }
+        
+        .score-value {
+            font-size: clamp(18px, 2.5vh, 24px);
+            font-weight: bold;
+        }
+        
+        .slide-number-badge {
+            color: #667eea;
+        }
+        
+        .correct-score {
+            color: #48bb78;
+        }
+        
+        .wrong-score {
+            color: #f56565;
+        }
+        
+        .slide-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            min-height: 0;
+        }
+        
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: clamp(15px, 2.5vh, 35px) clamp(15px, 2.5vw, 40px);
+            display: none;
+            opacity: 0;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        .slide::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .slide::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .slide::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 10px;
+        }
+        
+        .slide.active {
+            display: flex;
+            opacity: 1;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Info Slides */
+        .info-slide {
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(20px, 3vh, 35px);
+        }
+        
+        .intro-slide { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); }
+        .type-slide-1 { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+        .type-slide-2 { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); }
+        .type-slide-3 { background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%); }
+        .type-slide-4 { background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); }
+        .type-slide-5 { background: linear-gradient(135deg, #ffedd5 0%, #fed7aa 100%); }
+        
+        .info-card {
+            background: white;
+            padding: clamp(25px, 4vh, 45px) clamp(25px, 4vw, 45px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: min(700px, 90vw);
+            width: 100%;
+        }
+        
+        .info-icon {
+            font-size: clamp(50px, 8vh, 80px);
+            text-align: center;
+            margin-bottom: clamp(15px, 2vh, 25px);
+        }
+        
+        .info-title {
+            color: #1e40af;
+            font-size: clamp(24px, 4vh, 36px);
+            text-align: center;
+            margin-bottom: clamp(15px, 2vh, 20px);
+            font-weight: bold;
+            line-height: 1.3;
+        }
+        
+        .info-subtitle {
+            color: #64748b;
+            font-size: clamp(16px, 2.2vh, 20px);
+            text-align: center;
+            margin-bottom: clamp(20px, 3vh, 30px);
+            font-style: italic;
+        }
+        
+        .info-description {
+            color: #334155;
+            font-size: clamp(15px, 2.2vh, 19px);
+            line-height: 1.8;
+            margin-bottom: clamp(20px, 3vh, 30px);
+            text-align: center;
+        }
+        
+        .info-examples {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            padding: clamp(18px, 2.5vh, 25px);
+            border-radius: 15px;
+            border-left: 5px solid #3b82f6;
+        }
+        
+        .info-examples-title {
+            color: #1e40af;
+            font-size: clamp(16px, 2.3vh, 20px);
+            font-weight: bold;
+            margin-bottom: clamp(12px, 1.8vh, 18px);
+        }
+        
+        .info-examples-text {
+            color: #0f766e;
+            font-size: clamp(14px, 2vh, 18px);
+            line-height: 1.8;
+        }
+        
+        .intro-content {
+            text-align: center;
+        }
+        
+        .intro-main {
+            font-size: clamp(18px, 2.8vh, 24px);
+            color: #1e3a8a;
+            line-height: 1.8;
+            margin-bottom: clamp(20px, 3vh, 30px);
+        }
+        
+        .intro-example {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            padding: clamp(15px, 2.2vh, 22px);
+            border-radius: 12px;
+            margin-top: clamp(15px, 2.2vh, 25px);
+        }
+        
+        .intro-example strong {
+            color: #1e40af;
+            font-size: clamp(15px, 2.2vh, 19px);
+        }
+        
+        .intro-example span {
+            color: #0f766e;
+            font-size: clamp(14px, 2.1vh, 18px);
+        }
+        
+        /* Question Slides */
+        .question-slide {
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(15px, 2.5vh, 30px);
+            background: white;
+        }
+        
+        .question-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: clamp(8px, 1.2vh, 12px) clamp(20px, 4vw, 30px);
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: clamp(14px, 2vh, 18px);
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.4);
+            flex-shrink: 0;
+        }
+        
+        .question-box {
+            background: #f7fafc;
+            padding: clamp(20px, 3vh, 35px) clamp(20px, 3vw, 35px);
+            border-radius: 15px;
+            width: 100%;
+            max-width: min(700px, 90vw);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+        
+        .question-text {
+            font-size: clamp(16px, 2.5vh, 24px);
+            color: #2d3748;
+            line-height: 1.6;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, #ffd700 0%, #ffed4e 100%);
+            padding: 3px clamp(8px, 1.5vw, 12px);
+            border-radius: 6px;
+            font-weight: bold;
+            color: #2d3748;
+            box-shadow: 0 2px 6px rgba(255, 215, 0, 0.4);
+            white-space: nowrap;
+        }
+        
+        .options-container {
+            width: 100%;
+            max-width: min(700px, 90vw);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 0;
+        }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(10px, 1.5vh, 15px);
+            margin-bottom: clamp(10px, 2vh, 20px);
+        }
+        
+        .option-btn {
+            background: white;
+            border: 3px solid #cbd5e0;
+            padding: clamp(15px, 2vh, 22px) clamp(10px, 2vw, 18px);
+            border-radius: 12px;
+            font-size: clamp(14px, 2vh, 18px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans Gujarati', 'Shruti', Arial, sans-serif;
+            font-weight: 600;
+            color: #2d3748;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.4;
+            min-height: clamp(60px, 8vh, 80px);
+        }
+        
+        .option-btn:hover:not(.disabled) {
+            border-color: #667eea;
+            background: #edf2f7;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .option-btn.correct {
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+            border-color: #48bb78;
+            color: #22543d;
+            animation: correctPulse 0.6s ease;
+            position: relative;
+        }
+        
+        .option-btn.correct::after {
+            content: '✓';
+            position: absolute;
+            right: 10px;
+            font-size: clamp(20px, 3vh, 28px);
+            color: #22543d;
+        }
+        
+        .option-btn.wrong {
+            background: linear-gradient(135deg, #fed7d7 0%, #fc8181 100%);
+            border-color: #f56565;
+            color: #742a2a;
+            animation: wrongShake 0.6s ease;
+            position: relative;
+        }
+        
+        .option-btn.wrong::after {
+            content: '✗';
+            position: absolute;
+            right: 10px;
+            font-size: clamp(20px, 3vh, 28px);
+            color: #742a2a;
+        }
+        
+        .option-btn.disabled {
+            pointer-events: none;
+            opacity: 0.7;
+        }
+        
+        @keyframes correctPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        @keyframes wrongShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .result-message {
+            text-align: center;
+            padding: clamp(12px, 2vh, 18px);
+            border-radius: 12px;
+            font-size: clamp(14px, 2vh, 18px);
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease;
+            line-height: 1.4;
+        }
+        
+        .result-message.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .result-message.correct {
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+            color: #22543d;
+            border: 2px solid #48bb78;
+        }
+        
+        .result-message.wrong {
+            background: linear-gradient(135deg, #fed7d7 0%, #fc8181 100%);
+            color: #742a2a;
+            border: 2px solid #f56565;
+        }
+
+        /* Matching Exercise */
+        .matching-slide {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .matching-card {
+            background: white;
+            padding: clamp(15px, 2.5vh, 30px) clamp(15px, 2.5vw, 30px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: min(800px, 95vw);
+            width: 100%;
+        }
+
+        .matching-title {
+            color: #1e40af;
+            font-size: clamp(18px, 2.8vh, 24px);
+            text-align: center;
+            margin-bottom: clamp(8px, 1.2vh, 12px);
+            font-weight: bold;
+        }
+
+        .matching-instruction {
+            color: #64748b;
+            font-size: clamp(13px, 1.8vh, 16px);
+            text-align: center;
+            margin-bottom: clamp(15px, 2.2vh, 22px);
+            line-height: 1.5;
+        }
+
+        .matching-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(12px, 2vh, 20px);
+            margin-bottom: clamp(12px, 2vh, 18px);
+        }
+
+        .column {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(6px, 1vh, 10px);
+        }
+
+        .column-header {
+            text-align: center;
+            font-size: clamp(14px, 2vh, 18px);
+            font-weight: bold;
+            color: #1e40af;
+            padding: clamp(6px, 1vh, 10px);
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-radius: 10px;
+            margin-bottom: clamp(3px, 0.5vh, 6px);
+        }
+
+        .match-item {
+            background: white;
+            border: 3px solid #cbd5e0;
+            padding: clamp(10px, 1.5vh, 16px);
+            border-radius: 12px;
+            font-size: clamp(14px, 1.9vh, 17px);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-align: center;
+            user-select: none;
+        }
+
+        .match-item:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .match-item.selected {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-color: #667eea;
+            color: #3730a3;
+        }
+
+        .match-item.matched {
+            background: linear-gradient(135deg, #c6f6d5 0%, #9ae6b4 100%);
+            border-color: #48bb78;
+            color: #22543d;
+            cursor: default;
+            pointer-events: none;
+        }
+
+        .match-item.wrong-match {
+            animation: wrongShake 0.5s ease;
+        }
+
+        .matching-score {
+            text-align: center;
+            padding: clamp(10px, 1.5vh, 15px);
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-radius: 12px;
+            font-size: clamp(15px, 2vh, 18px);
+            font-weight: bold;
+            color: #1e40af;
+        }
+        
+        /* Classification Exercise */
+        .classification-slide {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .classification-card {
+            background: white;
+            padding: clamp(15px, 2.5vh, 30px) clamp(15px, 2.5vw, 30px);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            max-width: min(900px, 95vw);
+            width: 100%;
+        }
+
+        .classification-title {
+            color: #166534;
+            font-size: clamp(18px, 2.8vh, 24px);
+            text-align: center;
+            margin-bottom: clamp(8px, 1.2vh, 12px);
+            font-weight: bold;
+        }
+
+        .classification-instruction {
+            color: #64748b;
+            font-size: clamp(13px, 1.8vh, 16px);
+            text-align: center;
+            margin-bottom: clamp(15px, 2.2vh, 22px);
+            line-height: 1.5;
+        }
+
+        .words-container {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            padding: clamp(15px, 2.2vh, 22px);
+            border-radius: 12px;
+            margin-bottom: clamp(15px, 2.2vh, 22px);
+        }
+
+        .words-title {
+            color: #1e40af;
+            font-size: clamp(15px, 2.1vh, 18px);
+            font-weight: bold;
+            margin-bottom: clamp(10px, 1.5vh, 15px);
+            text-align: center;
+        }
+
+        .words-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: clamp(8px, 1.2vh, 12px);
+            justify-content: center;
+        }
+
+        .word-chip {
+            background: white;
+            border: 3px solid #3b82f6;
+            padding: clamp(8px, 1.2vh, 12px) clamp(15px, 2.5vw, 20px);
+            border-radius: 20px;
+            font-size: clamp(14px, 1.9vh, 17px);
+            font-weight: 600;
+            color: #1e40af;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .word-chip:hover:not(.used) {
+            background: #dbeafe;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+
+        .word-chip.selected {
+            background: #fef08a;
+            border: 3px solid #eab308;
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(234, 179, 8, 0.5);
+        }
+
+        .word-chip.used {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: #cbd5e0;
+            color: #94a3b8;
+            pointer-events: none;
+        }
+
+        .categories-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+            gap: clamp(12px, 2vh, 18px);
+        }
+
+        .category-box {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 3px solid #f59e0b;
+            border-radius: 15px;
+            padding: clamp(12px, 1.8vh, 18px);
+            min-height: clamp(120px, 18vh, 160px);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .category-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+            border-color: #d97706;
+        }
+
+        .category-box.highlight {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.6);
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
+            50% { box-shadow: 0 0 30px rgba(59, 130, 246, 0.8); }
+        }
+
+        .category-header {
+            font-size: clamp(14px, 2vh, 17px);
+            font-weight: bold;
+            color: #92400e;
+            text-align: center;
+            margin-bottom: clamp(8px, 1.2vh, 12px);
+            padding-bottom: clamp(6px, 1vh, 10px);
+            border-bottom: 2px solid #f59e0b;
+        }
+
+        .category-items {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(5px, 0.8vh, 8px);
+            min-height: clamp(60px, 10vh, 80px);
+        }
+
+        .category-item {
+            background: white;
+            padding: clamp(6px, 1vh, 10px);
+            border-radius: 8px;
+            font-size: clamp(13px, 1.8vh, 16px);
+            text-align: center;
+            border: 2px solid #fbbf24;
+            color: #92400e;
+            font-weight: 500;
+        }
+
+        .classification-actions {
+            display: flex;
+            gap: clamp(10px, 1.5vw, 15px);
+            justify-content: center;
+            margin-top: clamp(15px, 2.2vh, 22px);
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+            border: none;
+            padding: clamp(10px, 1.5vh, 14px) clamp(20px, 4vw, 30px);
+            border-radius: 25px;
+            font-size: clamp(14px, 2vh, 17px);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans Gujarati', 'Shruti', Arial, sans-serif;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+        }
+
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        }
+
+        .classification-result {
+            text-align: center;
+            padding: clamp(12px, 1.8vh, 18px);
+            border-radius: 12px;
+            font-size: clamp(15px, 2.1vh, 18px);
+            font-weight: bold;
+            margin-top: clamp(12px, 1.8vh, 18px);
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        .classification-result.show {
+            opacity: 1;
+        }
+
+        .classification-result.success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+            border: 2px solid #10b981;
+        }
+
+        .classification-result.partial {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+            border: 2px solid #f59e0b;
+        }
+        
+        /* Final Slide */
+        .final-slide {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: clamp(15px, 2vh, 25px);
+            text-align: center;
+        }
+        
+        .final-slide h2 {
+            font-size: clamp(24px, 4vh, 38px);
+            line-height: 1.3;
+        }
+        
+        .final-percentage {
+            font-size: clamp(50px, 10vh, 80px);
+            font-weight: bold;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            line-height: 1;
+        }
+        
+        .final-message {
+            font-size: clamp(16px, 2.5vh, 22px);
+            line-height: 1.5;
+            max-width: 90%;
+        }
+        
+        .final-stats {
+            display: flex;
+            gap: clamp(12px, 2vw, 25px);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .stat-box {
+            background: rgba(255,255,255,0.2);
+            padding: clamp(15px, 2vh, 22px) clamp(20px, 3vw, 30px);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            min-width: clamp(100px, 20vw, 140px);
+        }
+        
+        .stat-box .label {
+            font-size: clamp(12px, 1.6vh, 15px);
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .stat-box .value {
+            font-size: clamp(28px, 4.5vh, 38px);
+            font-weight: bold;
+            line-height: 1;
+        }
+        
+        /* Footer with Tabs */
+        .footer {
+            background: #f7fafc;
+            border-top: 2px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+        
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            gap: clamp(5px, 1vw, 10px);
+            padding: clamp(8px, 1.5vh, 12px) clamp(10px, 2vw, 20px);
+            background: #edf2f7;
+            border-bottom: 2px solid #cbd5e0;
+        }
+        
+        .tab-btn {
+            background: white;
+            color: #4a5568;
+            border: 2px solid #cbd5e0;
+            padding: clamp(8px, 1.2vh, 12px) clamp(15px, 3vw, 25px);
+            border-radius: 20px;
+            font-size: clamp(12px, 1.7vh, 15px);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans Gujarati', 'Shruti', Arial, sans-serif;
+            flex: 1;
+            max-width: clamp(100px, 20vw, 150px);
+        }
+        
+        .tab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .tab-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            padding: clamp(12px, 2vh, 20px) clamp(15px, 3vw, 35px);
+            background: #f7fafc;
+        }
+        
+        .nav-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: clamp(10px, 1.5vh, 14px) clamp(25px, 5vw, 40px);
+            border-radius: 25px;
+            font-size: clamp(14px, 2vh, 18px);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans Gujarati', 'Shruti', Arial, sans-serif;
+            box-shadow: 0 3px 12px rgba(102, 126, 234, 0.4);
+        }
+        
+        .nav-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.5);
+        }
+        
+        .nav-btn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        
+        .restart-btn {
+            background: white;
+            color: #667eea;
+            border: none;
+            padding: clamp(12px, 1.8vh, 16px) clamp(30px, 6vw, 45px);
+            border-radius: 25px;
+            font-size: clamp(16px, 2.2vh, 19px);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans Gujarati', 'Shruti', Arial, sans-serif;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .restart-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        @media (orientation: portrait) and (max-width: 500px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .matching-container {
+                grid-template-columns: 1fr;
+                gap: clamp(15px, 2.5vh, 25px);
+            }
+            
+            .tab-btn {
+                font-size: clamp(11px, 1.5vh, 13px);
+                padding: clamp(6px, 1vh, 10px) clamp(10px, 2.5vw, 15px);
+            }
+        }
+        
+        .option-btn, .nav-btn, .restart-btn, .tab-btn, .match-item {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-wrapper">
+        <div class="header">
+            <h1>🎯 સંજ્ઞા પ્રકાર ઓળખો</h1>
+            <p>ગુજરાતી વ્યાકરણ - ઇન્ટરેક્ટિવ ક્વિઝ</p>
+        </div>
+        
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        
+        <div class="score-board">
+            <div class="score-item" style="flex: 1; text-align: center;">
+                <div class="score-label" style="font-size: clamp(11px, 1.6vh, 14px); color: #667eea; font-weight: 600;">Makvana Sanjaysir</div>
+                <div class="score-value" style="font-size: clamp(13px, 1.9vh, 16px); color: #4a5568; font-weight: 500;">Piparadi 2 Primary School</div>
+            </div>
+        </div>
+        
+        <div class="slide-container" id="slideContainer"></div>
+        
+        <div class="footer">
+            <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab('info')">📚 માહિતી</button>
+                <button class="tab-btn" onclick="switchTab('matching')">🔗 જોડણી</button>
+                <button class="tab-btn" onclick="switchTab('classification')">📋 વર્ગીકરણ</button>
+                <button class="tab-btn" onclick="switchTab('quiz')">❓ પ્રશ્નો</button>
+            </div>
+            <div class="navigation">
+                <button class="nav-btn" id="prevBtn" onclick="previousSlide()" disabled>← પાછળ</button>
+                <button class="nav-btn" id="nextBtn" onclick="nextSlide()">આગળ →</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { question: '<span class="highlight">ગાંધીજી</span> રાષ્ટ્રપિતા તરીકે ઓળખાય છે.', options: ['વ્યક્તિવાચક સંજ્ઞા', 'જાતિવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 0 },
+            { question: 'આ <span class="highlight">ગાય</span> ખૂબ દૂધ આપે છે.', options: ['વ્યક્તિવાચક સંજ્ઞા', 'જાતિવાચક સંજ્ઞા', 'દ્રવ્યવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 1 },
+            { question: 'સૈનિકોનું <span class="highlight">સૈન્ય</span> સરહદ પર તૈનાત છે.', options: ['જાતિવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'દ્રવ્યવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 1 },
+            { question: 'મને <span class="highlight">સોનાની</span> વીંટી ગમે છે.', options: ['વ્યક્તિવાચક સંજ્ઞા', 'જાતિવાચક સંજ્ઞા', 'દ્રવ્યવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા'], correct: 2 },
+            { question: 'બાળપણમાં ખૂબ <span class="highlight">નિર્દોષતા</span> હોય છે.', options: ['જાતિવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'દ્રવ્યવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 3 },
+            { question: '<span class="highlight">હિમાલય</span> સૌથી ઊંચો પર્વત છે.', options: ['વ્યક્તિવાચક સંજ્ઞા', 'જાતિવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 0 },
+            { question: '<span class="highlight">ખેડૂતે</span> ખેતરમાં ઘઉં વાવ્યા છે.', options: ['વ્યક્તિવાચક સંજ્ઞા', 'જાતિવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'દ્રવ્યવાચક સંજ્ઞા'], correct: 1 },
+            { question: 'આકાશમાં <span class="highlight">પક્ષીઓ</span> ઉડી રહ્યા છે.', options: ['જાતિવાચક સંજ્ઞા', 'વ્યક્તિવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 0 },
+            { question: 'સભામાં મોટી <span class="highlight">ભીડ</span> જમા થઈ હતી.', options: ['જાતિવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'વ્યક્તિવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 1 },
+            { question: 'મને તેની <span class="highlight">ઈમાનદારી</span> પર ગર્વ છે.', options: ['જાતિવાચક સંજ્ઞા', 'દ્રવ્યવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 3 },
+            { question: '<span class="highlight">ગંગા</span> પવિત્ર નદી મનાય છે.', options: ['વ્યક્તિવાચક સંજ્ઞા', 'જાતિવાચક સંજ્ઞા', 'દ્રવ્યવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 0 },
+            { question: '<span class="highlight">બિલાડીએ</span> દૂધ પી લીધું.', options: ['વ્યક્તિવાચક સંજ્ઞા', 'જાતિવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'દ્રવ્યવાચક સંજ્ઞા'], correct: 1 },
+            { question: 'ચાવીઓનું <span class="highlight">ઝૂમખું</span> ટેબલ પર પડ્યું છે.', options: ['જાતિવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'દ્રવ્યવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 1 },
+            { question: '<span class="highlight">શિક્ષક</span> વર્ગમાં ભણાવે છે.', options: ['જાતિવાચક સંજ્ઞા', 'વ્યક્તિવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 0 },
+            { question: '<span class="highlight">ક્રોધ</span> મનુષ્યનો શત્રુ છે.', options: ['જાતિવાચક સંજ્ઞા', 'દ્રવ્યવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 3 },
+            { question: '<span class="highlight">સરદાર પટેલ</span> લોખંડી પુરુષ હતા.', options: ['વ્યક્તિવાચક સંજ્ઞા', 'જાતિવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 0 },
+            { question: 'પહાડ પરથી <span class="highlight">પાણી</span> વહી રહ્યું છે.', options: ['જાતિવાચક સંજ્ઞા', 'દ્રવ્યવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 1 },
+            { question: 'વર્ગમાં <span class="highlight">વિદ્યાર્થીઓ</span> શાંત બેઠા છે.', options: ['જાતિવાચક સંજ્ઞા', 'વ્યક્તિવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'દ્રવ્યવાચક સંજ્ઞા'], correct: 0 },
+            { question: '<span class="highlight">સુરત</span> ડાયમંડ સિટી કહેવાય છે.', options: ['વ્યક્તિવાચક સંજ્ઞા', 'જાતિવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 0 },
+            { question: 'તહેવારોમાં ખૂબ <span class="highlight">આનંદ</span> મળે છે.', options: ['જાતિવાચક સંજ્ઞા', 'દ્રવ્યવાચક સંજ્ઞા', 'સમૂહવાચક સંજ્ઞા', 'ભાવવાચક સંજ્ઞા'], correct: 3 }
+        ];
+
+        const matchingSets = [
+            {
+                title: 'સેટ ૧ - વ્યક્તિ અને સ્થળ',
+                pairs: [
+                    { id: 1, proper: 'ગાંધીજી', common: 'નેતા' },
+                    { id: 2, proper: 'અમદાવાદ', common: 'શહેર' },
+                    { id: 3, proper: 'ગુજરાત', common: 'રાજ્ય' },
+                    { id: 4, proper: 'ભારત', common: 'દેશ' },
+                    { id: 5, proper: 'રવિન્દ્રનાથ ટાગોર', common: 'કવિ' }
+                ]
+            },
+            {
+                title: 'સેટ ૨ - પર્વત અને નદી',
+                pairs: [
+                    { id: 1, proper: 'હિમાલય', common: 'પર્વત' },
+                    { id: 2, proper: 'ગંગા', common: 'નદી' },
+                    { id: 3, proper: 'સાબરમતી', common: 'નદીકાંઠો' },
+                    { id: 4, proper: 'ગિરનાર', common: 'પહાડ' },
+                    { id: 5, proper: 'સહ્યાદ્રિ', common: 'પર્વતમાળા' }
+                ]
+            },
+            {
+                title: 'સેટ ૩ - મનુષ્ય અને વ્યવસાય',
+                pairs: [
+                    { id: 1, proper: 'સચિન તેંડુલકર', common: 'ખેલાડી' },
+                    { id: 2, proper: 'લતા મંગેશકર', common: 'ગાયિકા' },
+                    { id: 3, proper: 'રતન ટાટા', common: 'ઉદ્યોગપતિ' },
+                    { id: 4, proper: 'નરેન્દ્ર મોદી', common: 'વડાપ્રધાન' },
+                    { id: 5, proper: 'કલ્પના ચાવલા', common: 'અવકાશયાત્રી' }
+                ]
+            },
+            {
+                title: 'સેટ ૪ - ગ્રંથ અને ભાષા',
+                pairs: [
+                    { id: 1, proper: 'રામાયણ', common: 'મહાકાવ્ય' },
+                    { id: 2, proper: 'મહાભારત', common: 'ગ્રંથ' },
+                    { id: 3, proper: 'ગુજરાતી', common: 'ભાષા' },
+                    { id: 4, proper: 'સંસ્કૃત', common: 'ભાષા' },
+                    { id: 5, proper: 'ગીતા', common: 'પુસ્તક' }
+                ]
+            },
+            {
+                title: 'સેટ ૫ - મહિના અને ત્યોહાર',
+                pairs: [
+                    { id: 1, proper: 'દિવાળી', common: 'પર્વ' },
+                    { id: 2, proper: 'હોળી', common: 'તહેવાર' },
+                    { id: 3, proper: 'નવરાત્રી', common: 'ઉત્સવ' },
+                    { id: 4, proper: 'જાન્યુઆરી', common: 'મહિનો' },
+                    { id: 5, proper: 'શનિવાર', common: 'વાર' }
+                ]
+            }
+        ];
+
+        const classificationSets = [
+            {
+                title: 'સેટ ૧ - મિશ્ર વર્ગીકરણ',
+                words: ['ગાંધીજી', 'શહેર', 'સુરત', 'નદી', 'હિમાલય', 'ગાય', 'સૈન્ય', 'ટોળું', 'સોનું', 'પાણી', 'દયા', 'ક્રોધ', 'ભારત', 'પર્વત', 'ઝૂમખું'],
+                categories: {
+                    'વ્યક્તિવાચક': ['ગાંધીજી', 'સુરત', 'હિમાલય', 'ભારત'],
+                    'જાતિવાચક': ['શહેર', 'નદી', 'ગાય', 'પર્વત'],
+                    'સમૂહવાચક': ['સૈન્ય', 'ટોળું', 'ઝૂમખું'],
+                    'દ્રવ્યવાચક': ['સોનું', 'પાણી'],
+                    'ભાવવાચક': ['દયા', 'ક્રોધ']
+                }
+            },
+            {
+                title: 'સેટ ૨ - મિશ્ર વર્ગીકરણ',
+                words: ['રમેશ', 'કૂતરું', 'ગંગા', 'પુસ્તક', 'અમદાવાદ', 'વૃક્ષ', 'ભીડ', 'સભા', 'સરઘસ', 'દૂધ', 'લોખંડ', 'તેલ', 'સુખ', 'પ્રેમ', 'હિંમત'],
+                categories: {
+                    'વ્યક્તિવાચક': ['રમેશ', 'ગંગા', 'અમદાવાદ'],
+                    'જાતિવાચક': ['કૂતરું', 'પુસ્તક', 'વૃક્ષ'],
+                    'સમૂહવાચક': ['ભીડ', 'સભા', 'સરઘસ'],
+                    'દ્રવ્યવાચક': ['દૂધ', 'લોખંડ', 'તેલ'],
+                    'ભાવવાચક': ['સુખ', 'પ્રેમ', 'હિંમત']
+                }
+            },
+            {
+                title: 'સેટ ૩ - મિશ્ર વર્ગીકરણ',
+                words: ['સચિન', 'નેતા', 'ગિરનાર', 'શિક્ષક', 'રાજકોટ', 'ખેડૂત', 'કાફલો', 'ઢગલો', 'વર્ગ', 'ચાંદી', 'ઘઉં', 'રૂ', 'ઈમાનદારી', 'નિર્દોષતા', 'બાળપણ'],
+                categories: {
+                    'વ્યક્તિવાચક': ['સચિન', 'ગિરનાર', 'રાજકોટ'],
+                    'જાતિવાચક': ['નેતા', 'શિક્ષક', 'ખેડૂત'],
+                    'સમૂહવાચક': ['કાફલો', 'ઢગલો', 'વર્ગ'],
+                    'દ્રવ્યવાચક': ['ચાંદી', 'ઘઉં', 'રૂ'],
+                    'ભાવવાચક': ['ઈમાનદારી', 'નિર્દોષતા', 'બાળપણ']
+                }
+            },
+            {
+                title: 'સેટ ૪ - મિશ્ર વર્ગીકરણ',
+                words: ['લતા મંગેશકર', 'બિલાડી', 'સાબરમતી', 'પક્ષી', 'દિલ્હી', 'માણસ', 'લશ્કર', 'સમિતિ', 'પરિવાર', 'કપાસ', 'દૂધ', 'માખણ', 'ગરમી', 'ઠંડક', 'મીઠાશ'],
+                categories: {
+                    'વ્યક્તિવાચક': ['લતા મંગેશકર', 'સાબરમતી', 'દિલ્હી'],
+                    'જાતિવાચક': ['બિલાડી', 'પક્ષી', 'માણસ'],
+                    'સમૂહવાચક': ['લશ્કર', 'સમિતિ', 'પરિવાર'],
+                    'દ્રવ્યવાચક': ['કપાસ', 'દૂધ', 'માખણ'],
+                    'ભાવવાચક': ['ગરમી', 'ઠંડક', 'મીઠાશ']
+                }
+            },
+            {
+                title: 'સેટ ૫ - મિશ્ર વર્ગીકરણ',
+                words: ['રતન ટાટા', 'ગાય', 'નર્મદા', 'છોકરો', 'મુંબઈ', 'વિદ્યાર્થી', 'ટીમ', 'મંડળી', 'જૂથ', 'સોનું', 'પાણી', 'ચોખા', 'દુઃખ', 'આનંદ', 'સત્ય'],
+                categories: {
+                    'વ્યક્તિવાચક': ['રતન ટાટા', 'નર્મદા', 'મુંબઈ'],
+                    'જાતિવાચક': ['ગાય', 'છોકરો', 'વિદ્યાર્થી'],
+                    'સમૂહવાચક': ['ટીમ', 'મંડળી', 'જૂથ'],
+                    'દ્રવ્યવાચક': ['સોનું', 'પાણી', 'ચોખા'],
+                    'ભાવવાચક': ['દુઃખ', 'આનંદ', 'સત્ય']
+                }
+            }
+        ];
+
+        let currentTab = 'info';
+        let currentSlideIndex = 0;
+        let correctCount = 0;
+        let wrongCount = 0;
+        let answered = Array(questions.length).fill(false);
+        let matchingStates = matchingSets.map(() => ({
+            matched: [],
+            selectedProper: null,
+            selectedCommon: null,
+            score: 0
+        }));
+        
+        let classificationStates = classificationSets.map(() => ({
+            usedWords: [],
+            categories: {
+                'વ્યક્તિવાચક': [],
+                'જાતિવાચક': [],
+                'સમૂહવાચક': [],
+                'દ્રવ્યવાચક': [],
+                'ભાવવાચક': []
+            }
+        }));
+        let selectedWord = null;
+        
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        const infoSlides = [
+            { type: 'intro', title: '📚 સંજ્ઞા શું છે?', content: `
+                <div class="intro-main"><strong>સંજ્ઞા (Noun)</strong> એટલે સરળ ભાષામાં કહીએ તો 'નામ'. જે શબ્દ કોઈ વ્યક્તિ, વસ્તુ, સ્થળ, જાતિ, દ્રવ્ય કે ભાવની ઓળખ આપે છે, તેને ગુજરાતી વ્યાકરણમાં 'સંજ્ઞા' કહે છે.</div>
+                <div class="intro-example"><strong>ઉદાહરણ:</strong><br><span>રમેશ, ગિરનાર, પાણી, દયા, ટોળું</span></div>
+            `},
+            { type: 'type-1', icon: '👤', title: '૧. વ્યક્તિવાચક સંજ્ઞા', subtitle: '(Proper Noun)', desc: 'જ્યારે કોઈ શબ્દ કોઈ ચોક્કસ વ્યક્તિ, પ્રાણી કે સ્થળની ઓળખ આપે, ત્યારે તેને વ્યક્તિવાચક સંજ્ઞા કહેવાય છે. આ નામથી તે એક જ વસ્તુ કે વ્યક્તિનો નિર્દેશ થાય છે.', examples: '<strong>વ્યક્તિ:</strong> ગાંધીજી, સરદાર પટેલ, મીરા<br><strong>સ્થળ:</strong> ગુજરાત, ભારત, અમદાવાદ, સુરત<br><strong>પર્વત/નદી:</strong> ગિરનાર, ગંગા, હિમાલય, સાબરમતી' },
+            { type: 'type-2', icon: '🐄', title: '૨. જાતિવાચક સંજ્ઞા', subtitle: '(Common Noun)', desc: 'જ્યારે કોઈ શબ્દ આખા વર્ગ કે સમૂહને લાગુ પડતો હોય અને તેમાંથી દરેક વ્યક્તિ કે વસ્તુને તે નામ આપી શકાય, ત્યારે તેને જાતિવાચક સંજ્ઞા કહેવાય છે. આ નામ આખી \'જાતિ\' દર્શાવે છે.', examples: 'પર્વત, નદી, શહેર, વૃક્ષ, છોકરો, ગાય, પુસ્તક, શિક્ષક, ખેડૂત, પક્ષી, બિલાડી, વિદ્યાર્થી<br><br><strong>યાદ રાખો:</strong> નર્મદા = વ્યક્તિવાચક, પણ નદી = જાતિવાચક' },
+            { type: 'type-3', icon: '👥', title: '૩. સમૂહવાચક સંજ્ઞા', subtitle: '(Collective Noun)', desc: 'જે શબ્દ કોઈ એક વ્યક્તિ કે વસ્તુ માટે નહીં, પરંતુ આખા સમૂહ કે જૂથ માટે વપરાય છે, તેને સમૂહવાચક સંજ્ઞા કહેવાય છે. આ શબ્દ બોલવાથી એકથી વધુ વ્યક્તિઓ કે વસ્તુઓનો ખ્યાલ આવે છે.', examples: '<strong>સૈન્ય</strong> (સૈનિકોનો સમૂહ)<br><strong>ટોળું</strong> (માણસોનો સમૂહ)<br><strong>ઝૂમખું</strong> (દ્રાક્ષ કે ચાવીઓનું)<br><strong>ભીડ</strong> (લોકોનો સમૂહ)<br>સભા, સરઘસ, કાફલો, ઢગલો' },
+            { type: 'type-4', icon: '💧', title: '૪. દ્રવ્યવાચક સંજ્ઞા', subtitle: '(Material Noun)', desc: 'જે પદાર્થોને ગણી શકાતા નથી (એક, બે, ત્રણ... એમ ગણતરી ન થાય) પણ માપી કે તોલી શકાય છે, તેને દ્રવ્યવાચક સંજ્ઞા કહેવાય છે. આમાં પ્રવાહી, અનાજ, અને ધાતુઓનો સમાવેશ થાય છે.', examples: '<strong>પ્રવાહી:</strong> પાણી, દૂધ, તેલ, ઘી, છાશ<br><strong>ધાતુ:</strong> સોનું, લોખંડ, ચાંદી, તાંબુ<br><strong>અનાજ/અન્ય:</strong> ઘઉં, ચોખા, બાજરી, રૂ, કાપડ, માટી' },
+            { type: 'type-5', icon: '💭', title: '૫. ભાવવાચક સંજ્ઞા', subtitle: '(Abstract Noun)', desc: 'જે વસ્તુ કે બાબતને આપણે જોઈ કે સ્પર્શી શકતા નથી, માત્ર અનુભવી શકીએ છીએ, તેને ભાવવાચક સંજ્ઞા કહેવાય છે. આમાં ગુણ, ક્રિયા કે સ્થિતિનો ભાવ હોય છે.', examples: '<strong>લાગણી:</strong> પ્રેમ, ક્રોધ, દયા, સુખ, દુઃખ, આનંદ<br><strong>ગુણ:</strong> સત્ય, હિંમત, ઠંડક, ગરમી, મીઠાશ, ઈમાનદારી<br><strong>અવસ્થા:</strong> બાળપણ, નિર્દોષતા, ઊંઘ, ગરીબાઈ' }
+        ];
+
+        function playCorrectSound() {
+            const o = audioContext.createOscillator(), g = audioContext.createGain();
+            o.connect(g); g.connect(audioContext.destination);
+            o.frequency.value = 800; o.type = 'sine';
+            g.gain.setValueAtTime(0.3, audioContext.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            o.start(audioContext.currentTime); o.stop(audioContext.currentTime + 0.5);
+            setTimeout(() => {
+                const o2 = audioContext.createOscillator(), g2 = audioContext.createGain();
+                o2.connect(g2); g2.connect(audioContext.destination);
+                o2.frequency.value = 1000; o2.type = 'sine';
+                g2.gain.setValueAtTime(0.3, audioContext.currentTime);
+                g2.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                o2.start(audioContext.currentTime); o2.stop(audioContext.currentTime + 0.5);
+            }, 100);
+        }
+
+        function playWrongSound() {
+            const o = audioContext.createOscillator(), g = audioContext.createGain();
+            o.connect(g); g.connect(audioContext.destination);
+            o.frequency.value = 200; o.type = 'sawtooth';
+            g.gain.setValueAtTime(0.3, audioContext.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            o.start(audioContext.currentTime); o.stop(audioContext.currentTime + 0.5);
+        }
+
+        function renderSlides() {
+            const container = document.getElementById('slideContainer');
+            let html = '';
+            
+            if (currentTab === 'info') {
+                infoSlides.forEach((slide, i) => {
+                    if (slide.type === 'intro') {
+                        html += `<div class="slide info-slide intro-slide ${i === 0 ? 'active' : ''}">
+                            <div class="info-card">
+                                <div class="info-icon">${slide.title.split(' ')[0]}</div>
+                                <div class="info-title">${slide.title}</div>
+                                <div class="intro-content">${slide.content}</div>
+                            </div>
+                        </div>`;
+                    } else {
+                        const slideClass = `type-slide-${slide.type.split('-')[1]}`;
+                        html += `<div class="slide info-slide ${slideClass}">
+                            <div class="info-card">
+                                <div class="info-icon">${slide.icon}</div>
+                                <div class="info-title">${slide.title}</div>
+                                <div class="info-subtitle">${slide.subtitle}</div>
+                                <div class="info-description">${slide.desc}</div>
+                                <div class="info-examples">
+                                    <div class="info-examples-title">📝 ઉદાહરણો:</div>
+                                    <div class="info-examples-text">${slide.examples}</div>
+                                </div>
+                            </div>
+                        </div>`;
+                    }
+                });
+            } else if (currentTab === 'matching') {
+                matchingSets.forEach((set, setIdx) => {
+                    const shuffledProper = [...set.pairs].sort(() => Math.random() - 0.5);
+                    const shuffledCommon = [...set.pairs].sort(() => Math.random() - 0.5);
+                    
+                    html += `<div class="slide matching-slide ${setIdx === 0 ? 'active' : ''}">
+                        <div class="matching-card">
+                            <div class="question-badge">${set.title}</div>
+                            <div class="matching-title">વ્યક્તિવાચક ને જાતિવાચક સાથે જોડો</div>
+                            <div class="matching-instruction">
+                                પહેલા વ્યક્તિવાચક સંજ્ઞા પસંદ કરો, પછી યોગ્ય જાતિવાચક સંજ્ઞા પસંદ કરો
+                            </div>
+                            <div class="matching-container">
+                                <div class="column">
+                                    <div class="column-header">વ્યક્તિવાચક</div>
+                                    ${shuffledProper.map(pair => `
+                                        <div class="match-item" data-set="${setIdx}" data-type="proper" data-id="${pair.id}" onclick="selectItem(${setIdx}, this, 'proper', ${pair.id})">
+                                            ${pair.proper}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div class="column">
+                                    <div class="column-header">જાતિવાચક</div>
+                                    ${shuffledCommon.map(pair => `
+                                        <div class="match-item" data-set="${setIdx}" data-type="common" data-id="${pair.id}" onclick="selectItem(${setIdx}, this, 'common', ${pair.id})">
+                                            ${pair.common}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div class="matching-score">
+                                જોડાયેલી જોડી: <span id="score-${setIdx}">0</span> / ${set.pairs.length}
+                            </div>
+                        </div>
+                    </div>`;
+                });
+            } else if (currentTab === 'classification') {
+                classificationSets.forEach((set, setIdx) => {
+                    const state = classificationStates[setIdx];
+                    
+                    html += `<div class="slide classification-slide ${setIdx === 0 ? 'active' : ''}">
+                        <div class="classification-card">
+                            <div class="question-badge">${set.title}</div>
+                            <div class="classification-title">આપેલ શબ્દોનું વર્ગીકરણ કરો</div>
+                            <div class="classification-instruction">
+                                પહેલા શબ્દ પર ક્લિક કરો (પીળો થશે) → પછી યોગ્ય કોલમ પર ક્લિક કરો (દરેક કોલમમાં બરાબર 3 શબ્દો)
+                            </div>
+                            
+                            <div class="words-container">
+                                <div class="words-title">🔤 શબ્દો</div>
+                                <div class="words-grid" id="words-grid-${setIdx}">
+                                    ${set.words.map((word, idx) => `
+                                        <div class="word-chip ${state.usedWords.includes(word) ? 'used' : ''}" 
+                                             onclick="handleWordClick(event, ${setIdx}, '${word}')"
+                                             id="word-${setIdx}-${idx}">
+                                            ${word}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            
+                            <div class="categories-container" id="categories-${setIdx}">
+                                ${Object.keys(set.categories).map(cat => `
+                                    <div class="category-box" 
+                                         data-category="${cat}"
+                                         data-setidx="${setIdx}"
+                                         onclick="handleCategoryClick(event, ${setIdx}, '${cat}')">
+                                        <div class="category-header">${cat}</div>
+                                        <div class="category-items" id="cat-${setIdx}-${cat}">
+                                            ${state.categories[cat].map(word => `
+                                                <div class="category-item">${word}</div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div class="classification-actions">
+                                <button class="action-btn" onclick="checkClassification(${setIdx})">✓ તપાસો</button>
+                                <button class="action-btn secondary" onclick="resetClassification(${setIdx})">↻ ફરી શરૂ કરો</button>
+                            </div>
+                            
+                            <div class="classification-result" id="result-class-${setIdx}"></div>
+                        </div>
+                    </div>`;
+                });
+            } else {
+                questions.forEach((q, i) => {
+                    html += `<div class="slide question-slide ${i === 0 ? 'active' : ''}">
+                        <div class="question-badge">પ્રશ્ન ${i + 1} / ${questions.length}</div>
+                        <div class="question-box"><div class="question-text">${q.question}</div></div>
+                        <div class="options-container">
+                            <div class="options-grid">
+                                ${q.options.map((opt, optIdx) => `
+                                    <button class="option-btn" onclick="checkAnswer(${i}, ${optIdx})" id="option-${i}-${optIdx}">${opt}</button>
+                                `).join('')}
+                            </div>
+                            <div class="result-message" id="result-${i}"></div>
+                        </div>
+                    </div>`;
+                });
+                html += `<div class="slide final-slide">
+                    <h2>🎊 ક્વિઝ સંપૂર્ણ! 🎊</h2>
+                    <div class="final-percentage" id="finalPercentage">0%</div>
+                    <div class="final-stats">
+                        <div class="stat-box"><div class="label">કુલ</div><div class="value">${questions.length}</div></div>
+                        <div class="stat-box"><div class="label">સાચા ✓</div><div class="value" id="finalCorrect">0</div></div>
+                        <div class="stat-box"><div class="label">ખોટા ✗</div><div class="value" id="finalWrong">0</div></div>
+                    </div>
+                    <div class="final-message" id="finalMessage"></div>
+                    <button class="restart-btn" onclick="location.reload()">🔄 ફરી શરૂ કરો</button>
+                </div>`;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            currentSlideIndex = 0;
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            renderSlides();
+            updateUI();
+        }
+
+        function selectItem(setIdx, element, type, id) {
+            if (element.classList.contains('matched')) return;
+            
+            const state = matchingStates[setIdx];
+            
+            if (type === 'proper') {
+                document.querySelectorAll(`[data-set="${setIdx}"][data-type="proper"]`).forEach(el => el.classList.remove('selected'));
+                element.classList.add('selected');
+                state.selectedProper = id;
+            } else {
+                document.querySelectorAll(`[data-set="${setIdx}"][data-type="common"]`).forEach(el => el.classList.remove('selected'));
+                element.classList.add('selected');
+                state.selectedCommon = id;
+            }
+            
+            if (state.selectedProper !== null && state.selectedCommon !== null) {
+                checkMatch(setIdx);
+            }
+        }
+
+        function checkMatch(setIdx) {
+            const state = matchingStates[setIdx];
+            const set = matchingSets[setIdx];
+            
+            const properEl = document.querySelector(`[data-set="${setIdx}"][data-type="proper"][data-id="${state.selectedProper}"]`);
+            const commonEl = document.querySelector(`[data-set="${setIdx}"][data-type="common"][data-id="${state.selectedCommon}"]`);
+            
+            // Check if the selected IDs match (same pair)
+            if (state.selectedProper === state.selectedCommon) {
+                properEl.classList.remove('selected');
+                properEl.classList.add('matched');
+                commonEl.classList.remove('selected');
+                commonEl.classList.add('matched');
+                state.score++;
+                document.getElementById(`score-${setIdx}`).textContent = state.score;
+                playCorrectSound();
+                
+                if (state.score === set.pairs.length) {
+                    setTimeout(() => {
+                        alert(`🎉 શાબાશ! ${set.title} પૂર્ણ થઈ!`);
+                    }, 500);
+                }
+            } else {
+                properEl.classList.add('wrong-match');
+                commonEl.classList.add('wrong-match');
+                playWrongSound();
+                setTimeout(() => {
+                    properEl.classList.remove('selected', 'wrong-match');
+                    commonEl.classList.remove('selected', 'wrong-match');
+                }, 600);
+            }
+            
+            state.selectedProper = null;
+            state.selectedCommon = null;
+        }
+
+        let draggedWord = null;
+        let draggedSetIdx = null;
+        let clickSelectedWord = null;
+        let clickSelectedSetIdx = null;
+
+        function handleDragStart(event, setIdx, word) {
+            draggedWord = word;
+            draggedSetIdx = setIdx;
+            event.target.classList.add('dragging');
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', word);
+        }
+
+        function handleDragEnd(event) {
+            event.target.classList.remove('dragging');
+            // Remove drag-over class from all category boxes
+            document.querySelectorAll('.category-box').forEach(box => {
+                box.classList.remove('drag-over');
+            });
+        }
+
+        function handleWordClick(event, setIdx, word) {
+            const state = classificationStates[setIdx];
+            
+            // Check if already used
+            if (state.usedWords.includes(word)) return;
+            
+            // Deselect all words in this set
+            document.querySelectorAll(`#words-grid-${setIdx} .word-chip`).forEach(el => {
+                el.style.background = 'white';
+                el.style.border = '2px solid #3b82f6';
+            });
+            
+            // Select this word
+            event.currentTarget.style.background = '#dbeafe';
+            event.currentTarget.style.border = '3px solid #2563eb';
+            
+            clickSelectedWord = word;
+            clickSelectedSetIdx = setIdx;
+            
+            // Highlight all category boxes
+            document.querySelectorAll(`#categories-${setIdx} .category-box`).forEach(box => {
+                box.style.boxShadow = '0 0 15px rgba(59, 130, 246, 0.5)';
+            });
+        }
+
+        function handleCategoryClick(event, setIdx, category) {
+            // Check if word is selected
+            if (!clickSelectedWord || clickSelectedSetIdx !== setIdx) {
+                return;
+            }
+            
+            const state = classificationStates[setIdx];
+            
+            // Check if category already has 3 words
+            if (state.categories[category].length >= 3) {
+                alert('આ કોલમ ભરાઈ ગયો છે! (મહત્તમ 3 શબ્દો)');
+                return;
+            }
+            
+            // Add word to category
+            state.categories[category].push(clickSelectedWord);
+            state.usedWords.push(clickSelectedWord);
+            
+            // Update UI - add to category
+            const catContainer = document.getElementById(`cat-${setIdx}-${category}`);
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'category-item';
+            itemDiv.textContent = clickSelectedWord;
+            itemDiv.style.animation = 'slideIn 0.3s ease';
+            catContainer.appendChild(itemDiv);
+            
+            // Mark word as used
+            const wordEl = Array.from(document.querySelectorAll(`#words-grid-${setIdx} .word-chip`))
+                .find(el => el.textContent.trim() === clickSelectedWord);
+            if (wordEl) {
+                wordEl.classList.add('used');
+                wordEl.setAttribute('draggable', 'false');
+                wordEl.style.cursor = 'not-allowed';
+                wordEl.style.background = 'white';
+                wordEl.style.border = '2px solid #cbd5e0';
+            }
+            
+            // Remove highlights from category boxes
+            document.querySelectorAll(`#categories-${setIdx} .category-box`).forEach(box => {
+                box.style.boxShadow = '';
+            });
+            
+            clickSelectedWord = null;
+            clickSelectedSetIdx = null;
+        }
+
+        function handleDragStart(event, setIdx, word) {
+            draggedWord = word;
+            draggedSetIdx = setIdx;
+            event.target.classList.add('dragging');
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', word);
+        }
+
+        function handleDragEnd(event) {
+            event.target.classList.remove('dragging');
+            // Remove drag-over class from all category boxes
+            document.querySelectorAll('.category-box').forEach(box => {
+                box.classList.remove('drag-over');
+            });
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            if (event.dataTransfer) {
+                event.dataTransfer.dropEffect = 'move';
+            }
+            
+            // Find the category box - traverse up the DOM
+            let target = event.target;
+            let attempts = 0;
+            while (target && !target.classList.contains('category-box') && attempts < 10) {
+                target = target.parentElement;
+                attempts++;
+            }
+            
+            if (target && target.classList.contains('category-box')) {
+                // Remove from all first
+                document.querySelectorAll('.category-box').forEach(box => {
+                    box.classList.remove('drag-over');
+                });
+                target.classList.add('drag-over');
+            }
+            
+            return false;
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            let target = event.target;
+            let attempts = 0;
+            while (target && !target.classList.contains('category-box') && attempts < 10) {
+                target = target.parentElement;
+                attempts++;
+            }
+            
+            if (target && target.classList.contains('category-box')) {
+                // Only remove if we're actually leaving the box
+                const rect = target.getBoundingClientRect();
+                const x = event.clientX;
+                const y = event.clientY;
+                
+                if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+                    target.classList.remove('drag-over');
+                }
+            }
+        }
+
+        function handleDrop(event, setIdx, category) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Remove drag-over from all
+            document.querySelectorAll('.category-box').forEach(box => {
+                box.classList.remove('drag-over');
+            });
+            
+            if (!draggedWord || draggedSetIdx !== setIdx) {
+                console.log('No word selected or wrong set');
+                return false;
+            }
+            
+            const state = classificationStates[setIdx];
+            
+            // Check if word is already used
+            if (state.usedWords.includes(draggedWord)) {
+                console.log('Word already used');
+                return false;
+            }
+            
+            // Check if category already has 3 words
+            if (state.categories[category].length >= 3) {
+                setTimeout(() => alert('આ કોલમ ભરાઈ ગયો છે! (મહત્તમ 3 શબ્દો)'), 100);
+                draggedWord = null;
+                draggedSetIdx = null;
+                return false;
+            }
+            
+            // Add word to category
+            state.categories[category].push(draggedWord);
+            state.usedWords.push(draggedWord);
+            
+            // Update UI - add to category
+            const catContainer = document.getElementById(`cat-${setIdx}-${category}`);
+            if (catContainer) {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'category-item';
+                itemDiv.textContent = draggedWord;
+                itemDiv.style.animation = 'slideIn 0.3s ease';
+                catContainer.appendChild(itemDiv);
+            }
+            
+            // Mark word as used
+            const wordEl = Array.from(document.querySelectorAll(`#words-grid-${setIdx} .word-chip`))
+                .find(el => el.textContent.trim() === draggedWord);
+            if (wordEl) {
+                wordEl.classList.add('used');
+                wordEl.setAttribute('draggable', 'false');
+                wordEl.style.cursor = 'not-allowed';
+            }
+            
+            draggedWord = null;
+            draggedSetIdx = null;
+            
+            return false;
+        }
+
+        function resetClassification(setIdx) {
+            const state = classificationStates[setIdx];
+            
+            // Get a random different set
+            let newSetIdx = Math.floor(Math.random() * classificationSets.length);
+            // Make sure we get a different set
+            let attempts = 0;
+            while (newSetIdx === setIdx && attempts < 10) {
+                newSetIdx = Math.floor(Math.random() * classificationSets.length);
+                attempts++;
+            }
+            
+            // Copy the new set data to current position
+            const newSet = classificationSets[newSetIdx];
+            classificationSets[setIdx] = {
+                title: newSet.title,
+                words: [...newSet.words],
+                categories: JSON.parse(JSON.stringify(newSet.categories))
+            };
+            
+            // Reset state
+            state.usedWords = [];
+            state.categories = {
+                'વ્યક્તિવાચક': [],
+                'જાતિવાચક': [],
+                'સમૂહવાચક': [],
+                'દ્રવ્યવાચક': [],
+                'ભાવવાચક': []
+            };
+            clickSelectedWord = null;
+            clickSelectedSetIdx = null;
+            draggedWord = null;
+            draggedSetIdx = null;
+            
+            // Re-render the slide
+            renderSlides();
+            
+            // Make sure the current slide stays active
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, idx) => {
+                slide.classList.remove('active');
+                if (idx === currentSlideIndex) {
+                    slide.classList.add('active');
+                }
+            });
+            
+            // Hide result message
+            const resultDiv = document.getElementById(`result-class-${setIdx}`);
+            if (resultDiv) {
+                resultDiv.classList.remove('show');
+            }
+        }
+
+        function checkClassification(setIdx) {
+            const state = classificationStates[setIdx];
+            const set = classificationSets[setIdx];
+            const resultDiv = document.getElementById(`result-class-${setIdx}`);
+            
+            let correctCount = 0;
+            let totalWords = 0;
+            
+            // Check each category
+            for (let cat in set.categories) {
+                const correct = set.categories[cat];
+                const userAnswers = state.categories[cat];
+                
+                userAnswers.forEach(word => {
+                    totalWords++;
+                    if (correct.includes(word)) {
+                        correctCount++;
+                    }
+                });
+            }
+            
+            const percentage = Math.round((correctCount / totalWords) * 100);
+            
+            if (percentage === 100) {
+                resultDiv.innerHTML = `🎉 શાબાશ! બધા જવાબ સાચા છે! (${correctCount}/${totalWords})`;
+                resultDiv.className = 'classification-result success show';
+                playCorrectSound();
+            } else {
+                resultDiv.innerHTML = `📊 તમારો સ્કોર: ${correctCount}/${totalWords} સાચા (${percentage}%)`;
+                resultDiv.className = 'classification-result partial show';
+            }
+        }
+
+        function checkAnswer(qi, so) {
+            if (answered[qi]) return;
+            const q = questions[qi], isCorrect = so === q.correct;
+            const resultDiv = document.getElementById(`result-${qi}`);
+            
+            for (let i = 0; i < q.options.length; i++) {
+                document.getElementById(`option-${qi}-${i}`).classList.add('disabled');
+            }
+            
+            const selectedBtn = document.getElementById(`option-${qi}-${so}`);
+            const correctBtn = document.getElementById(`option-${qi}-${q.correct}`);
+            
+            if (isCorrect) {
+                selectedBtn.classList.add('correct');
+                resultDiv.innerHTML = '✅ શાબાશ! સાચો જવાબ!';
+                resultDiv.className = 'result-message correct show';
+                playCorrectSound();
+                correctCount++;
+            } else {
+                selectedBtn.classList.add('wrong');
+                correctBtn.classList.add('correct');
+                resultDiv.innerHTML = `❌ ખોટો જવાબ!<br>સાચો: ${q.options[q.correct]}`;
+                resultDiv.className = 'result-message wrong show';
+                playWrongSound();
+                wrongCount++;
+            }
+            answered[qi] = true;
+        }
+
+        function nextSlide() {
+            const slides = document.querySelectorAll('.slide');
+            if (currentSlideIndex < slides.length - 1) {
+                slides[currentSlideIndex].classList.remove('active');
+                currentSlideIndex++;
+                slides[currentSlideIndex].classList.add('active');
+                slides[currentSlideIndex].scrollTop = 0;
+                updateUI();
+                if (currentTab === 'quiz' && currentSlideIndex === slides.length - 1) updateFinalResults();
+            }
+        }
+
+        function previousSlide() {
+            const slides = document.querySelectorAll('.slide');
+            if (currentSlideIndex > 0) {
+                slides[currentSlideIndex].classList.remove('active');
+                currentSlideIndex--;
+                slides[currentSlideIndex].classList.add('active');
+                slides[currentSlideIndex].scrollTop = 0;
+                updateUI();
+            }
+        }
+
+        function updateUI() {
+            const totalSlides = document.querySelectorAll('.slide').length;
+            
+            document.getElementById('progressBar').style.width = ((currentSlideIndex) / (totalSlides - 1)) * 100 + '%';
+            document.getElementById('prevBtn').disabled = currentSlideIndex === 0;
+            document.getElementById('nextBtn').style.visibility = currentSlideIndex === totalSlides - 1 ? 'hidden' : 'visible';
+        }
+
+        function updateFinalResults() {
+            const percentage = Math.round((correctCount / questions.length) * 100);
+            document.getElementById('finalPercentage').textContent = percentage + '%';
+            document.getElementById('finalCorrect').textContent = correctCount;
+            document.getElementById('finalWrong').textContent = wrongCount;
+            
+            const fm = document.getElementById('finalMessage');
+            if (percentage >= 90) fm.innerHTML = `અદ્ભુત! તમે સંજ્ઞા પ્રકારોમાં માસ્ટર છો! 🌟`;
+            else if (percentage >= 70) fm.innerHTML = `ખૂબ સારું! થોડી પ્રેક્ટિસથી તમે પરફેક્ટ થઈ જશો! 👍`;
+            else if (percentage >= 50) fm.innerHTML = `સારો પ્રયાસ! વધુ પ્રેક્ટિસ કરો! 📚`;
+            else fm.innerHTML = `ચિંતા ન કરો, ફરીથી પ્રયાસ કરો! 💪`;
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            else if (e.key === 'ArrowLeft') previousSlide();
+        });
+
+        window.onload = () => {
+            renderSlides();
+            updateUI();
+        };
+    </script>
+</body>
+</html>
